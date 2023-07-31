@@ -97,13 +97,16 @@ public class PlayerController : MonoBehaviour
 
                     }
                 }
-                else if (hit.transform.GetComponent<Interactable>() != null && hit.transform.GetComponent<Interactable>().playerID != playerID)
+
+                // If it's an interactable and the player ID is different than yours, attack if possible
+                else if (hit.transform.GetComponent<IDamageable>() != null && hit.transform.GetComponent<Interactable>().playerID != playerID)
                 {
+                    Debug.Log("Clicked Enemy to attack");
                     foreach (var selectableObj in selectedUnits)
                     {
                         if (selectableObj.CanAttack)
                         {
-                            selectableObj.GetComponent<BaseUnit>().AttackTarget(this.gameObject, hit.transform);
+                            selectableObj.GetComponent<BaseUnit>().AttackTarget(this.gameObject, hit.transform.GetComponent<IDamageable>());
                         }
                     }
                 }

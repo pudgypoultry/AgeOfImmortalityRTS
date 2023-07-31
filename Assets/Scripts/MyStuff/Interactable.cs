@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour, ISelectable
 {
+    [SerializeField]
     public int playerID = 0;
     protected bool isSelectable;
     protected bool isSelected;
     protected bool isGroupable;
     protected bool isGrouped;
+    [SerializeField]
     protected bool canAttack;
 
     protected Vector3 currentPosition;
@@ -25,13 +27,13 @@ public class Interactable : MonoBehaviour, ISelectable
     public Vector3 CurrentPosition { get => currentPosition; set => currentPosition = value; }
     #endregion
 
-    void Start()
+    protected virtual void Start()
     {
         selectorCircle.SetActive(false);
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         currentPosition = transform.position;
     }

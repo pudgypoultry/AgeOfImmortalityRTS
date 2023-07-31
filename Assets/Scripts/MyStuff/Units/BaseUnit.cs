@@ -34,10 +34,11 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     [SerializeField]
     protected float distanceTolerance = 0.5f;
     protected Vector3 targetPosition;
-    protected GameObject currentTarget;
+    protected IDamageable currentTarget;
 
     protected List<GameObject> currentGroup;
     protected Queue<Vector3> moveQueue = new Queue<Vector3>();
+    protected Queue<IDamageable> attackQueue = new Queue<IDamageable>();
     protected NavMeshAgent navAgent;
 
 
@@ -52,7 +53,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     #region IDamageable Specific Properties
     public float CurrentHP { get => currentHP; set => currentHP = value; }
     public float CurrentDefense { get => currentDefense; set => currentDefense = value; }
-    public GameObject CurrentTarget { get => currentTarget; set => currentTarget = value; }
+    public IDamageable CurrentTarget { get => currentTarget; set => currentTarget = value; }
     #endregion
 
     #region IMoveable Specific Properties
@@ -63,8 +64,9 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         navAgent = GetComponent<NavMeshAgent>();
         navAgent.speed = baseMovementSpeed;
         navAgent.stoppingDistance = meleeRange;
@@ -72,8 +74,10 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (currentTarget == null)
         {
             isAttacking = false;
@@ -95,6 +99,19 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
             navAgent.destination = transform.position;
         }
 
+        if (isAttacking)
+        {
+            Debug.Log("Poop");
+            navAgent.destination = currentTarget.CurrentPosition;
+
+            if ((transform.position - currentTarget.CurrentPosition).magnitude <= meleeRange)
+            {
+                CurrentTarget.AttackMe(this.gameObject, currentAttack);
+                Debug.Log(name + " attacked " + currentTarget + " for " + currentAttack + " damage!");
+
+            }
+        }
+
     }
 
     public virtual void ResetToBase()
@@ -105,6 +122,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
         currentMovementSpeed = baseMovementSpeed;
     }
 
+    // Public function that allows other units to attack this
     public virtual void AttackMe(GameObject source, float damageAmount)
     {
         damageAmount = damageAmount * currentDefense;
@@ -140,16 +158,22 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
             moveQueue.Clear();
         }
         moveQueue.Enqueue(target);
-        int i = 0;
-        foreach (Vector3 thing in moveQueue)
-        {
-            Debug.Log("     " + i++ + thing);
-        }
     }
 
-    public virtual void AttackTarget(GameObject source, Transform target)
+    public virtual void AttackTarget(GameObject source, IDamageable target)
     {
-        moveQueue.Enqueue(target.position);
+        if (!Input.GetKey(KeyCode.LeftShift))
+        {
+            attackQueue.Clear();
+        }
+        if (!attackQueue.Contains(target))
+        {
+            attackQueue.Enqueue(target);
+            currentTarget = target;
+        }
+
         isAttacking = true;
+        Debug.Log("Done this job");
     }
+
 }
