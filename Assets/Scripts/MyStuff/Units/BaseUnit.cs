@@ -24,6 +24,11 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected float baseAttack = 1;
     protected float currentAttack;
     [SerializeField]
+    protected float baseAttackSpeed = 1.0f;
+    protected float currentAttackSpeed;
+    protected float baseAttackTimer = 1.0f;
+    protected float attackTimer = 1.0f;
+    [SerializeField]
     protected float baseMovementSpeed = 1;
     protected float currentMovementSpeed;
     [SerializeField]
@@ -38,14 +43,14 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
     protected List<GameObject> currentGroup;
     protected Queue<Vector3> moveQueue = new Queue<Vector3>();
-    protected Queue<IDamageable> attackQueue = new Queue<IDamageable>();
+    protected List<IDamageable> attackQueue = new List<IDamageable>();
     protected NavMeshAgent navAgent;
 
 
 
     #region Shared Interface Properties
     public bool IsAttackable { get => isAttackable; set => isAttackable = value; }
-
+    public float CurrentAttackSpeed { get => currentAttackSpeed; set => currentAttackSpeed = value; }
     public bool IsMoveable { get => isMoveable; set => isMoveable = value; }
 
     #endregion
@@ -83,33 +88,59 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
             isAttacking = false;
         }
 
-        if (moveQueue.Count > 0 && !isAttacking)
+        if (moveQueue.Count > 0 && !isAttacking /*&& attackQueue.Count == 0*/)
         {
             navAgent.destination = moveQueue.Peek();
             // IF STATEMENT NOT TRIPPING
             if ((transform.position - moveQueue.Peek()).magnitude <= distanceTolerance && moveQueue.Count > 1)
             {
                 moveQueue.Dequeue();
-                Debug.Log("POOP " + ((transform.position - moveQueue.Peek()).magnitude - distanceTolerance));
+                // Debug.Log("POOP " + ((transform.position - moveQueue.Peek()).magnitude - distanceTolerance));
             }
 
         }
-        else if (!isAttacking)
+        else if (!isAttacking && attackQueue.Count == 0)
         {
             navAgent.destination = transform.position;
         }
 
         if (isAttacking)
         {
-            Debug.Log("Poop");
+            attackTimer -= Time.deltaTime * baseAttackSpeed;
+            // Debug.Log("Poop");
             navAgent.destination = currentTarget.CurrentPosition;
 
             if ((transform.position - currentTarget.CurrentPosition).magnitude <= meleeRange)
             {
-                CurrentTarget.AttackMe(this.gameObject, currentAttack);
-                Debug.Log(name + " attacked " + currentTarget + " for " + currentAttack + " damage!");
+                if (currentTarget != null)
+                {
+                    if (attackTimer <= 0)
+                    {
+                        Debug.Log("Made it to the damage step");
+                        if (currentTarget.AttackMe(this.gameObject, currentAttack))
+                        {
+                            isAttacking = false;
+                        }
 
+                        attackTimer = baseAttackTimer;
+                    }
+                    if (attackQueue.Count > 1 && attackQueue[0] == null && attackQueue[1] != null)
+                    {
+                        attackQueue.RemoveAt(0);
+                        currentTarget = attackQueue[0];
+                        Debug.Log("Current Target is: " + currentTarget);
+                    }
+
+                }
             }
+        }
+
+        else if (!isAttacking && attackQueue.Count > 1)
+        {
+            isAttacking = true;
+            attackQueue.RemoveAt(0);
+            currentTarget = attackQueue[0];
+            Debug.Log("Current Target is: " + currentTarget);
         }
 
     }
@@ -120,10 +151,11 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
         currentDefense = baseDefense;
         currentHP = baseHP;
         currentMovementSpeed = baseMovementSpeed;
+        currentAttackSpeed = baseAttackSpeed;
     }
 
     // Public function that allows other units to attack this
-    public virtual void AttackMe(GameObject source, float damageAmount)
+    public virtual bool AttackMe(GameObject source, float damageAmount)
     {
         damageAmount = damageAmount * currentDefense;
         if (damageAmount > 0.5)
@@ -132,17 +164,20 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
         }
 
         currentHP -= damageAmount;
-
+        // Debug.Log(name + "'s currentHP: " + currentHP);
         if (currentHP <= 0)
         {
             KillMe();
+            return true;
         }
+
+        return false;
     }
 
     protected virtual void KillMe()
     {
-        Debug.Log(name + " has died!");
-        Destroy(gameObject);
+        // Debug.Log(name + " has died!");
+        Destroy(gameObject, 0.2f);
     }
 
     public virtual void SetPosition(GameObject source, Vector3 target) 
@@ -152,28 +187,39 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
     public virtual void MoveTo(GameObject source, Vector3 target)
     {
-        isAttacking = false;
+
         if (!Input.GetKey(KeyCode.LeftShift))
         {
+            isAttacking = false;
             moveQueue.Clear();
         }
         moveQueue.Enqueue(target);
+
     }
 
     public virtual void AttackTarget(GameObject source, IDamageable target)
     {
+
+        isAttacking = true;
+
         if (!Input.GetKey(KeyCode.LeftShift))
         {
             attackQueue.Clear();
         }
         if (!attackQueue.Contains(target))
         {
-            attackQueue.Enqueue(target);
-            currentTarget = target;
+            attackQueue.Add(target);
+            currentTarget = attackQueue[0];
+            int i = 0;
+            for (i = 0; i < attackQueue.Count; i++)
+            { 
+                Debug.Log("Queue Member #" + i + ": " + attackQueue.ToArray()[i]);
+            }
         }
 
-        isAttacking = true;
-        Debug.Log("Done this job");
+        // Debug.Log("Done this job");
     }
+
+
 
 }

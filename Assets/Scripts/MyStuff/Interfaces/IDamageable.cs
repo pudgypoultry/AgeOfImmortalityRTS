@@ -8,6 +8,8 @@ public interface IDamageable
     float CurrentDefense { get; set; }
     Vector3 CurrentPosition { get; set; }
     IDamageable CurrentTarget { get; set; }
+    Transform transform { get; }
+    GameObject gameObject { get; }
 
-    void AttackMe(GameObject source, float damageAmount);
+    bool AttackMe(GameObject source, float damageAmount);
 }
