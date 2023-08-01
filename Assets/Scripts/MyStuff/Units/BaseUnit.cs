@@ -120,6 +120,10 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
                         if (currentTarget.AttackMe(this.gameObject, currentAttack))
                         {
                             isAttacking = false;
+                            if (attackQueue.Count == 1)
+                            {
+                                attackQueue.Clear();
+                            }
                         }
 
                         attackTimer = baseAttackTimer;
