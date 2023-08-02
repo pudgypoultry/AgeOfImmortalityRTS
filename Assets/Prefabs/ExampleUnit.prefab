@@ -154,10 +154,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerID: 0
+  canAttack: 1
   selectorCircle: {fileID: 5998574009725946242}
   baseHP: 10
   baseDefense: 1
   baseAttack: 1
+  baseAttackSpeed: 1
   baseMovementSpeed: 10
   meleeRange: 1
   projectileRange: 10

@@ -13,6 +13,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected bool isAttacking = false;
 
     protected bool attackCommandIssued;
+    protected bool isDead;
 
     [SerializeField]
     protected float baseHP = 10;
@@ -43,7 +44,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
     protected List<GameObject> currentGroup;
     protected Queue<Vector3> moveQueue = new Queue<Vector3>();
-    protected List<IDamageable> attackQueue = new List<IDamageable>();
+    protected Queue<IDamageable> attackQueue = new Queue<IDamageable>();
     protected NavMeshAgent navAgent;
 
 
@@ -68,6 +69,18 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     #endregion
 
 
+    public enum ActionMode
+    {
+        ACTION,
+        ATTACK,
+        BUILD,
+        IDLE,
+        MOVE
+    }
+
+    public ActionMode currentActionMode = ActionMode.IDLE;
+    protected Queue<ActionMode> actionQueue = new Queue<ActionMode>();
+
     // Start is called before the first frame update
     protected override void Start()
     {
@@ -83,69 +96,30 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     {
         base.Update();
 
-        if (currentTarget == null)
+        if (actionQueue.Count > 0)
         {
-            isAttacking = false;
+            currentActionMode = actionQueue.Peek();
+        }
+        else
+        {
+            currentActionMode = ActionMode.IDLE;
         }
 
-        if (moveQueue.Count > 0 && !isAttacking /*&& attackQueue.Count == 0*/)
+        if (currentActionMode == ActionMode.ATTACK)
         {
-            navAgent.destination = moveQueue.Peek();
-            // IF STATEMENT NOT TRIPPING
-            if ((transform.position - moveQueue.Peek()).magnitude <= distanceTolerance && moveQueue.Count > 1)
-            {
-                moveQueue.Dequeue();
-                // Debug.Log("POOP " + ((transform.position - moveQueue.Peek()).magnitude - distanceTolerance));
-            }
-
+            AttackBehavior();
         }
-        else if (!isAttacking && attackQueue.Count == 0)
+
+        else if (currentActionMode == ActionMode.MOVE)
+        {
+            MoveBehavior();
+        }
+
+        else if (currentActionMode != ActionMode.IDLE)
         {
             navAgent.destination = transform.position;
         }
 
-        if (isAttacking)
-        {
-            attackTimer -= Time.deltaTime * baseAttackSpeed;
-            // Debug.Log("Poop");
-            navAgent.destination = currentTarget.CurrentPosition;
-
-            if ((transform.position - currentTarget.CurrentPosition).magnitude <= meleeRange)
-            {
-                if (currentTarget != null)
-                {
-                    if (attackTimer <= 0)
-                    {
-                        Debug.Log("Made it to the damage step");
-                        if (currentTarget.AttackMe(this.gameObject, currentAttack))
-                        {
-                            isAttacking = false;
-                            if (attackQueue.Count == 1)
-                            {
-                                attackQueue.Clear();
-                            }
-                        }
-
-                        attackTimer = baseAttackTimer;
-                    }
-                    if (attackQueue.Count > 1 && attackQueue[0] == null && attackQueue[1] != null)
-                    {
-                        attackQueue.RemoveAt(0);
-                        currentTarget = attackQueue[0];
-                        Debug.Log("Current Target is: " + currentTarget);
-                    }
-
-                }
-            }
-        }
-
-        else if (!isAttacking && attackQueue.Count > 1)
-        {
-            isAttacking = true;
-            attackQueue.RemoveAt(0);
-            currentTarget = attackQueue[0];
-            Debug.Log("Current Target is: " + currentTarget);
-        }
 
     }
 
@@ -181,7 +155,12 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected virtual void KillMe()
     {
         // Debug.Log(name + " has died!");
-        Destroy(gameObject, 0.2f);
+        if (!isDead)
+        {
+            isDead = true;
+            Destroy(gameObject, 0.2f);
+        }
+
     }
 
     public virtual void SetPosition(GameObject source, Vector3 target) 
@@ -194,36 +173,150 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
         if (!Input.GetKey(KeyCode.LeftShift))
         {
-            isAttacking = false;
-            moveQueue.Clear();
+            ClearAllQueues();
         }
         moveQueue.Enqueue(target);
+        actionQueue.Enqueue(ActionMode.MOVE);
 
     }
 
     public virtual void AttackTarget(GameObject source, IDamageable target)
     {
 
-        isAttacking = true;
-
         if (!Input.GetKey(KeyCode.LeftShift))
         {
-            attackQueue.Clear();
+            ClearAllQueues();
         }
         if (!attackQueue.Contains(target))
         {
-            attackQueue.Add(target);
-            currentTarget = attackQueue[0];
+            attackQueue.Enqueue(target);
+            actionQueue.Enqueue(ActionMode.ATTACK);
+
+            currentTarget = attackQueue.Peek();
             int i = 0;
             for (i = 0; i < attackQueue.Count; i++)
             { 
-                Debug.Log("Queue Member #" + i + ": " + attackQueue.ToArray()[i]);
+                // Debug.Log("Queue Member #" + i + ": " + attackQueue.ToArray()[i]);
             }
         }
 
         // Debug.Log("Done this job");
     }
 
+    protected virtual void MoveBehavior()
+    {
+        navAgent.destination = moveQueue.Peek();
+        if ((transform.position - moveQueue.Peek()).magnitude <= distanceTolerance && moveQueue.Count > 1)
+        {
+            moveQueue.Dequeue();
+            actionQueue.Dequeue();
+        }
+    }
 
+    protected virtual void AttackBehavior()
+    {
+        attackTimer -= Time.deltaTime * baseAttackSpeed;
+        navAgent.destination = currentTarget.CurrentPosition;
 
+        if ((transform.position - currentTarget.CurrentPosition).magnitude <= meleeRange)
+        {
+            if (attackTimer <= 0)
+            {
+                // Debug.Log("Made it to the damage step");
+                if (currentTarget.AttackMe(this.gameObject, currentAttack) || currentTarget == null)
+                {
+                    attackQueue.Dequeue();
+                    actionQueue.Dequeue();
+                    navAgent.destination = transform.position;
+                }
+
+                attackTimer = baseAttackTimer;
+            }
+
+            if (attackQueue.Count > 0)
+            {
+                currentTarget = attackQueue.Peek();
+                // Debug.Log("Current Target is: " + currentTarget);
+            }
+        }
+    }
+
+    public virtual void ClearAllQueues()
+    {
+        attackQueue.Clear();
+        moveQueue.Clear();
+        actionQueue.Clear();
+    }
+
+    /*
+        if (currentTarget == null)
+        {
+            isAttacking = false;
+        }
+
+        if (moveQueue.Count > 0 && !isAttacking)
+        {
+            navAgent.destination = moveQueue.Peek();
+            // IF STATEMENT NOT TRIPPING
+            if ((transform.position - moveQueue.Peek()).magnitude <= distanceTolerance && moveQueue.Count > 1)
+            {
+                moveQueue.Dequeue();
+                // Debug.Log("POOP " + ((transform.position - moveQueue.Peek()).magnitude - distanceTolerance));
+            }
+
+        }
+        else if (!isAttacking && attackQueue.Count == 0)
+        {
+            navAgent.destination = transform.position;
+        }
+
+        if (isAttacking)
+        {
+
+            attackTimer -= Time.deltaTime * baseAttackSpeed;
+            // Debug.Log("Poop");
+            navAgent.destination = currentTarget.CurrentPosition;
+
+            if ((transform.position - currentTarget.CurrentPosition).magnitude <= meleeRange)
+            {
+                if (currentTarget != null)
+                {
+                    if (attackTimer <= 0)
+                    {
+                        Debug.Log("Made it to the damage step");
+                        if (currentTarget.AttackMe(this.gameObject, currentAttack))
+                        {
+                            isAttacking = false;
+                            if (attackQueue.Count == 1)
+                            {
+                                attackQueue.Clear();
+                            }
+                        }
+
+                        attackTimer = baseAttackTimer;
+                    }
+                    if (attackQueue.Count > 1 && attackQueue[0] == null && attackQueue[1] != null)
+                    {
+                        attackQueue.RemoveAt(0);
+                        currentTarget = attackQueue[0];
+                        Debug.Log("Current Target is: " + currentTarget);
+                    }
+                    navAgent.destination = transform.position;
+
+                }
+                else
+                {
+                    Debug.Log(name + " is giving up");
+                }
+            }
+        }
+
+        else if (!isAttacking && attackQueue.Count > 1)
+        {
+            isAttacking = true;
+            attackQueue.RemoveAt(0);
+            currentTarget = attackQueue[0];
+            Debug.Log("Current Target is: " + currentTarget);
+        }
+        */
 }
