@@ -98,7 +98,14 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
         if (actionQueue.Count > 0)
         {
+            /* 
+            if (currentActionMode != actionQueue.Peek())
+            {
+                Debug.Log("Changing from " + currentActionMode + " mode to " + actionQueue.Peek() + " mode.");
+            }
+            */
             currentActionMode = actionQueue.Peek();
+            // Debug.Log("Current Mode: " + currentActionMode);
         }
         else
         {
@@ -206,7 +213,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected virtual void MoveBehavior()
     {
         navAgent.destination = moveQueue.Peek();
-        if ((transform.position - moveQueue.Peek()).magnitude <= distanceTolerance && moveQueue.Count > 1)
+        if ((transform.position - moveQueue.Peek()).magnitude <= distanceTolerance)
         {
             moveQueue.Dequeue();
             actionQueue.Dequeue();
