@@ -11,6 +11,7 @@ public interface ISelectable
     bool IsGroupable { get; set; }
     bool IsGrouped { get; set; }
     bool CanAttack { get; set; }
+    bool CanBuild { get; set; }
     Vector3 CurrentPosition { get; set; }
 
     // void SetPosition(GameObject source, Vector3 target);

@@ -12,6 +12,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected bool isAttackable = true;
     protected bool isAttacking = false;
 
+
     protected bool attackCommandIssued;
     protected bool isDead;
 
@@ -30,6 +31,11 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected float baseAttackTimer = 1.0f;
     protected float attackTimer = 1.0f;
     [SerializeField]
+    protected float baseBuildSpeed = 1.0f;
+    protected float currentBuildSpeed;
+    protected float baseBuildTimer = 1.0f;
+    protected float buildTimer = 1.0f;
+    [SerializeField]
     protected float baseMovementSpeed = 1;
     protected float currentMovementSpeed;
     [SerializeField]
@@ -41,10 +47,12 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected float distanceTolerance = 0.5f;
     protected Vector3 targetPosition;
     protected IDamageable currentTarget;
+    protected IBuildable currentBuild;
 
     protected List<GameObject> currentGroup;
     protected Queue<Vector3> moveQueue = new Queue<Vector3>();
     protected Queue<IDamageable> attackQueue = new Queue<IDamageable>();
+    protected Queue<IBuildable> buildQueue = new Queue<IBuildable>();
     protected NavMeshAgent navAgent;
 
 
@@ -53,6 +61,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     public bool IsAttackable { get => isAttackable; set => isAttackable = value; }
     public float CurrentAttackSpeed { get => currentAttackSpeed; set => currentAttackSpeed = value; }
     public bool IsMoveable { get => isMoveable; set => isMoveable = value; }
+
 
     #endregion
 
@@ -115,6 +124,12 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
         if (currentActionMode == ActionMode.ATTACK)
         {
             AttackBehavior();
+            // Debug.Log("Made it here");
+        }
+
+        else if (currentActionMode == ActionMode.BUILD)
+        {
+            BuildBehavior();
         }
 
         else if (currentActionMode == ActionMode.MOVE)
@@ -200,6 +215,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
             actionQueue.Enqueue(ActionMode.ATTACK);
 
             currentTarget = attackQueue.Peek();
+            Debug.Log(currentTarget);
             int i = 0;
             for (i = 0; i < attackQueue.Count; i++)
             { 
@@ -208,6 +224,26 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
         }
 
         // Debug.Log("Done this job");
+    }
+
+    public virtual void BuildTarget(GameObject source, IBuildable target)
+    {
+        if (!Input.GetKey(KeyCode.LeftShift))
+        {
+            ClearAllQueues();
+        }
+        if (!buildQueue.Contains(target))
+        {
+            buildQueue.Enqueue(target);
+            actionQueue.Enqueue(ActionMode.BUILD);
+
+            currentBuild = buildQueue.Peek();
+            int i = 0;
+            for (i = 0; i < buildQueue.Count; i++)
+            {
+                // Debug.Log("Queue Member #" + i + ": " + attackQueue.ToArray()[i]);
+            }
+        }
     }
 
     protected virtual void MoveBehavior()
@@ -248,11 +284,41 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
         }
     }
 
+    protected virtual void BuildBehavior()
+    {
+        buildTimer -= Time.deltaTime * baseBuildSpeed;
+        navAgent.destination = currentBuild.CurrentPosition;
+
+        if ((transform.position - currentBuild.CurrentPosition).magnitude <= meleeRange)
+        {
+            if (buildTimer <= 0)
+            {
+                // BuildMe returns true if it's done being built
+                if (currentBuild.BuildMe(this.gameObject) || currentBuild == null)
+                {
+                    buildQueue.Dequeue();
+                    actionQueue.Dequeue();
+                    navAgent.destination = transform.position;
+                }
+
+                buildTimer = baseBuildTimer;
+            }
+
+            if (attackQueue.Count > 0)
+            {
+                currentBuild = buildQueue.Peek();
+                // Debug.Log("Current Target is: " + currentTarget);
+            }
+        }
+    }
+
     public virtual void ClearAllQueues()
     {
         attackQueue.Clear();
         moveQueue.Clear();
+        buildQueue.Clear();
         actionQueue.Clear();
+
     }
 
     /*

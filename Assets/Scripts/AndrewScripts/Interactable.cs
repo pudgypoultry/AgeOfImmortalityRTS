@@ -12,6 +12,8 @@ public class Interactable : MonoBehaviour, ISelectable
     protected bool isGrouped;
     [SerializeField]
     protected bool canAttack;
+    protected bool canBuild = false;
+
 
     protected Vector3 currentPosition;
 
@@ -24,6 +26,7 @@ public class Interactable : MonoBehaviour, ISelectable
     public bool IsGroupable { get => isGroupable; set => isGroupable = value; }
     public bool IsGrouped { get => isGrouped; set => isGrouped = value; }
     public bool CanAttack { get => canAttack; set => canAttack = value; }
+    public bool CanBuild { get => canBuild; set => canBuild = value; }
     public Vector3 CurrentPosition { get => currentPosition; set => currentPosition = value; }
     #endregion
 

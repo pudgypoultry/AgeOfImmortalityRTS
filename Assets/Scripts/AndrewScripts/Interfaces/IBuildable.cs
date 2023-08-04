@@ -9,4 +9,5 @@ public interface IBuildable
     List<int> BuildCosts { get; set; }
     List<string> BuildMaterials { get; set; }
     void PlaceMe(Vector3 placementPosition);
+    bool BuildMe(GameObject source);
 }

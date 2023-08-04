@@ -98,7 +98,7 @@ public class PlayerController : MonoBehaviour
                     }
                 }
 
-                // If it's an interactable and the player ID is different than yours, attack if possible
+                // If it's an IDamageable and the player ID is different than yours, attack if possible
                 else if (hit.transform.GetComponent<IDamageable>() != null && hit.transform.GetComponent<Interactable>().playerID != playerID)
                 {
                     Debug.Log("Clicked Enemy to attack");
@@ -107,6 +107,19 @@ public class PlayerController : MonoBehaviour
                         if (selectableObj.CanAttack)
                         {
                             selectableObj.GetComponent<BaseUnit>().AttackTarget(this.gameObject, hit.transform.GetComponent<IDamageable>());
+                        }
+                    }
+                }
+
+                // If it's an IBuildable and the player ID is the same as yours, build if possible
+                else if (hit.transform.GetComponent<IBuildable>() != null && hit.transform.GetComponent<Interactable>().playerID == playerID)
+                {
+                    Debug.Log("Clicked Building to build");
+                    foreach (var selectableObj in selectedUnits)
+                    {
+                        if (selectableObj.CanBuild)
+                        {
+                            selectableObj.GetComponent<BaseUnit>().BuildTarget(this.gameObject, hit.transform.GetComponent<IBuildable>());
                         }
                     }
                 }
