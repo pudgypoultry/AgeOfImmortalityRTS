@@ -1,14 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static ResourceTypes;
 
 public class PlayerController : MonoBehaviour
 {
     public int playerID = 0;
-    RaycastHit hit;
-    List<Interactable> selectedUnits = new List<Interactable>();
-    bool isDragging = false;
-    Vector3 originalMousePosition;
+    protected RaycastHit hit;
+    public List<Interactable> selectedUnits = new List<Interactable>();
+
+    public ResourceTypes[] resourceList = { ResourceTypes.BLOOD, ResourceTypes.FAITH, ResourceTypes.FOOD, ResourceTypes.GOLD, ResourceTypes.MADNESS, ResourceTypes.RAGE, ResourceTypes.STONE, ResourceTypes.WOOD };
+    public int[] resourceAmounts = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    public bool isDragging = false;
+    public Vector3 originalMousePosition;
 
     private void OnGUI()
     {
@@ -160,5 +165,54 @@ public class PlayerController : MonoBehaviour
         var cam = Camera.main;
         var viewportBounds = ScreenHelper.GetViewportBounds(cam, originalMousePosition, Input.mousePosition);
         return viewportBounds.Contains(cam.WorldToViewportPoint(thing.position));
+    }
+
+    // Add resources to the player's bank
+    public void AddResources(ResourceTypes type, int amount)
+    {
+        int count = 0;
+        foreach (ResourceTypes types in resourceList)
+        {
+            if (type == types)
+            {
+                resourceAmounts[count] += amount;
+                break;
+            }
+            count++;
+        }
+    }
+
+    // Check if player has the resources necessary for something
+    public bool CheckResources(ResourceTypes[] types, int[] amounts)
+    {
+        int count = 0;
+        foreach (ResourceTypes type in resourceList)
+        {
+            if (type == types[count])
+            {
+                if (amounts[count] > resourceAmounts[count])
+                {
+                    return false;
+
+                }
+                count++;
+            }
+        }
+
+        return true;
+    }
+
+    // Spend resources, always use check first to make sure it will be ok
+    public void SpendResources(ResourceTypes[] types, int[] amounts)
+    {
+        int count = 0;
+        foreach (ResourceTypes type in resourceList)
+        {
+            if (type == types[count])
+            {
+                resourceAmounts[count] -= amounts[count];
+                count++;
+            }
+        }
     }
 }

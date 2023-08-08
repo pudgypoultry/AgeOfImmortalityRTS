@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static ResourceTypes;
 
 [RequireComponent(typeof(NavMeshAgent))]
 
-public class BaseUnit : Interactable, IDamageable, IMoveable
+public class BaseUnit : Interactable, IDamageable, IMoveable, IProject
 {
 
     protected bool isMoveable = true;
@@ -15,6 +16,9 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
     protected bool attackCommandIssued;
     protected bool isDead;
+    [SerializeField]
+    protected float baseBuildTime = 1.0f;
+    protected float buildTime = 1.0f;
 
     [SerializeField]
     protected float baseHP = 10;
@@ -50,10 +54,14 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     protected IBuildable currentBuild;
 
     protected List<GameObject> currentGroup;
+
     protected Queue<Vector3> moveQueue = new Queue<Vector3>();
     protected Queue<IDamageable> attackQueue = new Queue<IDamageable>();
     protected Queue<IBuildable> buildQueue = new Queue<IBuildable>();
     protected NavMeshAgent navAgent;
+
+    protected List<ResourceTypes> buildMaterials = new List<ResourceTypes>();
+    protected List<int> buildCosts = new List<int>();
 
 
 
@@ -77,6 +85,12 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
     public Queue<Vector3> MoveQueue { get => moveQueue; set => moveQueue = value; }
     #endregion
 
+    #region IProject Specific Properties
+    public float BuildTime { get => buildTime; set => buildTime = value; }
+    public List<ResourceTypes> BuildMaterials { get => buildMaterials; set => buildMaterials = value; }
+    public List<int> BuildCosts { get => buildCosts; set => buildCosts = value; }
+
+    #endregion
 
     public enum ActionMode
     {
@@ -294,7 +308,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
             if (buildTimer <= 0)
             {
                 // BuildMe returns true if it's done being built
-                if (currentBuild.BuildMe(this.gameObject) || currentBuild == null)
+                if (currentBuild.BuildMe(this.gameObject, currentBuildSpeed) || currentBuild == null)
                 {
                     buildQueue.Dequeue();
                     actionQueue.Dequeue();
@@ -321,6 +335,17 @@ public class BaseUnit : Interactable, IDamageable, IMoveable
 
     }
 
+    public void PlaceMe(Vector3 placementPosition)
+    {
+        Instantiate(gameObject, placementPosition, Quaternion.identity);
+    }
+
+    // Overload for future use of a rally point
+    public void PlaceMe(Vector3 placementPosition, Vector3 rallyPosition)
+    {
+        BaseUnit newUnitCopy = Instantiate(gameObject, placementPosition, Quaternion.identity).GetComponent<BaseUnit>();
+        newUnitCopy.MoveTo(gameObject, rallyPosition);
+    }
     /*
         if (currentTarget == null)
         {

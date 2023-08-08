@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using static ResourceTypes;
 
-public interface IBuildable
+public interface IProject
 {
-
-    bool IsPlaced { get; set; }
     float BuildTime { get; set; }
-    Vector3 CurrentPosition { get; set; }
-    List<int> BuildCosts { get; }
     List<ResourceTypes> BuildMaterials { get; }
+    List<int> BuildCosts { get; set; }
     void PlaceMe(Vector3 placementPosition);
-    bool BuildMe(GameObject source, float buildAmount);
 }
+

@@ -7,7 +7,6 @@ public interface IDamageable
     float CurrentHP { get; set; }
     float CurrentDefense { get; set; }
     Vector3 CurrentPosition { get; set; }
-    IDamageable CurrentTarget { get; set; }
     Transform transform { get; }
     GameObject gameObject { get; }
 
