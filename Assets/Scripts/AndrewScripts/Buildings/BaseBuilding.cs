@@ -29,12 +29,18 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     protected GameObject builtPrefab;
     [SerializeField]
     protected GameObject destroyedPrefab;
+    protected PlayerManager player;
 
-    protected BuildState currentState = BuildState.CONSTRUCTING;
+    public BuildState currentState = BuildState.CONSTRUCTING;
 
     [SerializeField]
     public List<GameObject> buildOptions = new List<GameObject>();
 
+    public List<GameObject> buildQueue = new List<GameObject>();
+    public float buildProgress = 0;
+    [SerializeField]
+    protected GameObject summonPositionObject;
+    Vector3 summonPosition;
     #region IDamageable Specific Properties
     public float CurrentHP { get => currentHP; set => currentHP = value; }
     public float CurrentDefense { get => currentDefense; set => currentDefense = value; }
@@ -70,6 +76,8 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     protected override void Start()
     {
         base.Start();
+        ChangeState();
+        summonPosition = summonPositionObject.transform.position;
     }
 
     // Update is called once per frame
@@ -133,11 +141,11 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     public virtual bool BuildMe(GameObject source, float buildAmount)
     {
         buildTime += buildAmount;
-
+        ChangeState();
         if (DoneBeingBuilt())
         {
             currentState = BuildState.BUILT;
-            ChangeState();
+            
         }
         
         if (currentState != BuildState.BUILT)
@@ -167,8 +175,11 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
 
     protected virtual void ChangeState()
     {
+        Debug.Log("DOIN IT: " + currentState);
+        
         if (currentState == BuildState.CONSTRUCTING)
         {
+            Debug.Log("Poooooop");
             constructingPrefab.SetActive(true);
             builtPrefab.SetActive(false);
             destroyedPrefab.SetActive(false);
@@ -187,5 +198,48 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
             builtPrefab.SetActive(false);
             destroyedPrefab.SetActive(true);
         }
+    }
+
+    public virtual void AddProject(GameObject projectToAdd)
+    {
+        if (projectToAdd.GetComponent<IProject>() != null)
+        {
+            buildQueue.Add(projectToAdd);
+        }
+
+    }
+
+    public virtual void RemoveProject(GameObject projectToRemove)
+    {
+        if (buildQueue.Contains(projectToRemove))
+        {
+            if (buildQueue.IndexOf(projectToRemove) == 0)
+            {
+                buildProgress = 0;
+            }
+            buildQueue.Remove(projectToRemove);
+
+        }
+
+    }
+
+    protected virtual void BuildQueueBehavior()
+    {
+
+        if (buildQueue.Count > 0)
+        {
+            buildProgress += Time.deltaTime;
+            if (buildQueue[0].GetComponent<IProject>() != null && buildProgress > buildQueue[0].GetComponent<IProject>().BuildTime)
+            {
+                Instantiate(buildQueue[0], summonPosition, Quaternion.identity);
+                buildQueue.RemoveAt(0);
+                buildProgress = 0;
+            }
+        }
+    }
+
+    public virtual void StartProject(int projectOptionNumber)
+    {
+        buildQueue.Add(buildOptions[projectOptionNumber]);
     }
 }

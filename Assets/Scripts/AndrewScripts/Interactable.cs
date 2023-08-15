@@ -12,7 +12,8 @@ public class Interactable : MonoBehaviour, ISelectable
     protected bool isGrouped;
     [SerializeField]
     protected bool canAttack;
-    protected bool canBuild = false;
+    [SerializeField]
+    protected bool canBuild;
 
 
     protected Vector3 currentPosition;

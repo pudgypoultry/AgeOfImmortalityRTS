@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public ResourceTypes[] resourceList = { ResourceTypes.BLOOD, ResourceTypes.FAITH, ResourceTypes.FOOD, ResourceTypes.GOLD, ResourceTypes.MADNESS, ResourceTypes.RAGE, ResourceTypes.STONE, ResourceTypes.WOOD };
     public int[] resourceAmounts = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
+    public bool holdingSomething = false;
     public bool isDragging = false;
     public Vector3 originalMousePosition;
 
@@ -38,6 +39,7 @@ public class PlayerController : MonoBehaviour
         //Detect is mouse is down
         if (Input.GetMouseButtonDown(0))
         {
+
             originalMousePosition = Input.mousePosition;
             //Create a ray from camera to ground
             var camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -45,7 +47,7 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(camRay, out hit))
             {
                 //Do something with that data
-                //Debug.Log(hit.transform.tag);
+                Debug.Log("What you clicked: "+hit.transform.tag);
                 if (hit.transform.GetComponent<Interactable>() != null && hit.transform.GetComponent<Interactable>().playerID == playerID)
                 {
                     SelectUnit(hit.transform.GetComponent<Interactable>(), Input.GetKey(KeyCode.LeftShift));
@@ -215,4 +217,5 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
 }

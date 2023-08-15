@@ -8,6 +8,7 @@ public class BuildExample : MonoBehaviour
 
     public void SpawnExampleBlueprint()
     {
+        Debug.Log("making example building");
         Instantiate(exampleBlueprint);
     }
 }
