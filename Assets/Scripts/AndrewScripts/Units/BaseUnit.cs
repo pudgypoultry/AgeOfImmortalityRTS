@@ -13,12 +13,11 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected bool isAttackable = true;
     protected bool isAttacking = false;
 
-
     protected bool attackCommandIssued;
     protected bool isDead;
     [SerializeField]
     protected float baseBuildTime = 1.0f;
-    protected float buildTime = 1.0f;
+    protected float buildTime;
 
     [SerializeField]
     protected float baseHP = 10;
@@ -121,6 +120,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     {
         base.Start();
         currentBuildSpeed = baseBuildSpeed;
+        buildTime = baseBuildTime;
         navAgent = GetComponent<NavMeshAgent>();
         navAgent.speed = baseMovementSpeed;
         navAgent.stoppingDistance = meleeRange;
@@ -131,7 +131,6 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected override void Update()
     {
         base.Update();
-
         if (actionQueue.Count > 0)
         {
             /* 
@@ -284,7 +283,8 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected virtual void MoveBehavior()
     {
         navAgent.destination = moveQueue.Peek();
-        if ((transform.position - moveQueue.Peek()).magnitude <= distanceTolerance)
+        navAgent.stoppingDistance = distanceTolerance;
+        if ((transform.position - moveQueue.Peek()).magnitude <= navAgent.stoppingDistance)
         {
             moveQueue.Dequeue();
             actionQueue.Dequeue();
@@ -295,8 +295,9 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     {
         attackTimer -= Time.deltaTime * baseAttackSpeed;
         navAgent.destination = currentTarget.CurrentPosition;
+        navAgent.stoppingDistance = meleeRange;
 
-        if ((transform.position - currentTarget.CurrentPosition).magnitude <= meleeRange)
+        if ((transform.position - currentTarget.CurrentPosition).magnitude <= navAgent.stoppingDistance)
         {
             if (attackTimer <= 0)
             {
@@ -323,9 +324,10 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     {
         buildTimer -= Time.deltaTime * baseBuildSpeed;
         navAgent.destination = currentBuild.CurrentPosition;
-        
+        navAgent.stoppingDistance = meleeRange;
 
-        if ((transform.position - currentBuild.CurrentPosition).magnitude <= meleeRange)
+
+        if ((transform.position - currentBuild.CurrentPosition).magnitude <= navAgent.stoppingDistance)
         {
             if (buildTimer <= 0)
             {

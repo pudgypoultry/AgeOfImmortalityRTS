@@ -84,6 +84,7 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     protected override void Update()
     {
         base.Update();
+        BuildQueueBehavior();
     }
 
     public virtual bool AttackMe(GameObject source, float damageAmount)
@@ -226,7 +227,7 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     protected virtual void BuildQueueBehavior()
     {
 
-        if (buildQueue.Count > 0)
+        if (buildQueue.Count > 0 && currentState == BuildState.BUILT)
         {
             buildProgress += Time.deltaTime;
             if (buildQueue[0].GetComponent<IProject>() != null && buildProgress > buildQueue[0].GetComponent<IProject>().BuildTime)

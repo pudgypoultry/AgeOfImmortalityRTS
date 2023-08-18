@@ -155,15 +155,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerID: 0
   canAttack: 1
+  canBuild: 1
   selectorCircle: {fileID: 5998574009725946242}
+  baseBuildTime: 3
   baseHP: 10
   baseDefense: 1
   baseAttack: 1
   baseAttackSpeed: 1
+  baseBuildSpeed: 1
   baseMovementSpeed: 10
   meleeRange: 1
   projectileRange: 10
   distanceTolerance: 10
+  buildMaterials: 0700000003000000
+  buildCosts: 1e00000019000000
+  currentActionMode: 3
 --- !u!1 &5998574009725946242
 GameObject:
   m_ObjectHideFlags: 0
