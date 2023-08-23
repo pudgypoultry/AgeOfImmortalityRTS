@@ -5,7 +5,6 @@ using static ResourceTypes;
 
 public interface IBuildable
 {
-
     bool IsPlaced { get; set; }
     float BuildTime { get; set; }
     Vector3 CurrentPosition { get; set; }

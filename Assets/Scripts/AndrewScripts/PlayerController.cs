@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public int playerID = 0;
     protected RaycastHit hit;
     public List<Interactable> selectedUnits = new List<Interactable>();
+    public List<IDropOff> dropOffPoints = new List<IDropOff>();
 
     public ResourceTypes[] resourceList = { ResourceTypes.BLOOD, ResourceTypes.FAITH, ResourceTypes.FOOD, ResourceTypes.GOLD, ResourceTypes.MADNESS, ResourceTypes.RAGE, ResourceTypes.STONE, ResourceTypes.WOOD };
     public int[] resourceAmounts = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour
     public bool holdingSomething = false;
     public bool isDragging = false;
     public Vector3 originalMousePosition;
+
 
     private void OnGUI()
     {
@@ -130,6 +132,19 @@ public class PlayerController : MonoBehaviour
                         }
                     }
                 }
+
+                else if (hit.transform.GetComponent<IGatherable>() != null)
+                {
+                    Debug.Log("Clicked Node to gather");
+                    foreach (var selectableObj in selectedUnits)
+                    {
+                        Debug.Log("Telling " + selectableObj.gameObject.name + " to gather from " + hit.transform.name);
+                        if (selectableObj.CanGather)
+                        {
+                            selectableObj.GetComponent<BaseUnit>().GatherTarget(this.gameObject, hit.transform.GetComponent<IGatherable>());
+                        }
+                    }
+                }
             }
         }
 
@@ -187,33 +202,36 @@ public class PlayerController : MonoBehaviour
     // Check if player has the resources necessary for something
     public bool CheckResources(ResourceTypes[] types, int[] amounts)
     {
-        int count = 0;
-        foreach (ResourceTypes type in resourceList)
+        for (int i = 0; i < types.Length; i++)
         {
-            if (type == types[count])
+            foreach (ResourceTypes type in resourceList)
             {
-                if (amounts[count] > resourceAmounts[count])
+                if (type == types[i])
                 {
-                    return false;
-
+                    if (amounts[i] > resourceAmounts[System.Array.IndexOf(resourceList, type)])
+                    {
+                        return false;
+                    }
                 }
-                count++;
             }
         }
-
         return true;
     }
 
     // Spend resources, always use check first to make sure it will be ok
     public void SpendResources(ResourceTypes[] types, int[] amounts)
     {
-        int count = 0;
-        foreach (ResourceTypes type in resourceList)
+        for (int i = 0; i < types.Length; i++)
         {
-            if (type == types[count])
+            foreach (ResourceTypes type in resourceList)
             {
-                resourceAmounts[count] -= amounts[count];
-                count++;
+                Debug.Log("Currently trying to spend " + amounts[i] + " of " + types[i]);
+                if (type == types[i])
+                {
+                    
+                    resourceAmounts[System.Array.IndexOf(resourceList, type)] -= amounts[i];
+                    break;
+                }
             }
         }
     }

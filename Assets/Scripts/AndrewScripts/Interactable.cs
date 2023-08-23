@@ -6,6 +6,8 @@ public class Interactable : MonoBehaviour, ISelectable
 {
     [SerializeField]
     public int playerID = 0;
+    [SerializeField]
+    public PlayerController player;
     protected bool isSelectable;
     protected bool isSelected;
     protected bool isGroupable;
@@ -14,6 +16,8 @@ public class Interactable : MonoBehaviour, ISelectable
     protected bool canAttack;
     [SerializeField]
     protected bool canBuild;
+    [SerializeField]
+    protected bool canGather;
 
 
     protected Vector3 currentPosition;
@@ -28,6 +32,7 @@ public class Interactable : MonoBehaviour, ISelectable
     public bool IsGrouped { get => isGrouped; set => isGrouped = value; }
     public bool CanAttack { get => canAttack; set => canAttack = value; }
     public bool CanBuild { get => canBuild; set => canBuild = value; }
+    public bool CanGather { get => canGather; set => canGather = value; }
     public Vector3 CurrentPosition { get => currentPosition; set => currentPosition = value; }
     #endregion
 

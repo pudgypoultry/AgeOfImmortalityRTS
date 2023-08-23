@@ -29,18 +29,18 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     protected GameObject builtPrefab;
     [SerializeField]
     protected GameObject destroyedPrefab;
-    protected PlayerManager player;
 
     public BuildState currentState = BuildState.CONSTRUCTING;
 
     [SerializeField]
     public List<GameObject> buildOptions = new List<GameObject>();
-
     public List<GameObject> buildQueue = new List<GameObject>();
     public float buildProgress = 0;
     [SerializeField]
     protected GameObject summonPositionObject;
-    Vector3 summonPosition;
+    public Vector3 summonPosition;
+
+
     #region IDamageable Specific Properties
     public float CurrentHP { get => currentHP; set => currentHP = value; }
     public float CurrentDefense { get => currentDefense; set => currentDefense = value; }
@@ -52,18 +52,6 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     public List<int> BuildCosts { get => buildCosts; }
     public List<ResourceTypes> BuildMaterials { get => buildMaterials; }
     #endregion
-
-    /*
-    public enum ResourceTypes
-    {
-        FOOD,
-        GOLD,
-        MADNESS,
-        RAGE,
-        STONE,
-        WOOD
-    }
-    */
 
     public enum BuildState
     { 
@@ -78,6 +66,9 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
         base.Start();
         ChangeState();
         summonPosition = summonPositionObject.transform.position;
+
+
+
     }
 
     // Update is called once per frame
@@ -241,6 +232,26 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
 
     public virtual void StartProject(int projectOptionNumber)
     {
-        buildQueue.Add(buildOptions[projectOptionNumber]);
+        Debug.Log("poop");
+        if (buildOptions[projectOptionNumber].GetComponent<IProject>() != null)
+        {
+            Debug.Log("pooooop");
+            IProject currentProject = buildOptions[projectOptionNumber].GetComponent<IProject>();
+            Debug.Log("poooooooop");
+            if (player.CheckResources(currentProject.BuildMaterials.ToArray(), currentProject.BuildCosts.ToArray()))
+            {
+                Debug.Log("pooooooooooop");
+                player.SpendResources(currentProject.BuildMaterials.ToArray(), currentProject.BuildCosts.ToArray());
+                Debug.Log("pooooooooooooop");
+                buildQueue.Add(buildOptions[projectOptionNumber]);
+                Debug.Log("poooooooooooooooop");
+            }
+        }
+
+        else
+        {
+            Debug.Log("You fuckin goofed kiddo");
+        }
+
     }
 }

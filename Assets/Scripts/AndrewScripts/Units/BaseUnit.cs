@@ -12,6 +12,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected bool isMoveable = true;
     protected bool isAttackable = true;
     protected bool isAttacking = false;
+    protected bool bagFull = false;
 
     protected bool attackCommandIssued;
     protected bool isDead;
@@ -39,6 +40,13 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected float baseBuildTimer = 1.0f;
     protected float buildTimer = 1.0f;
     [SerializeField]
+    protected float baseGatherSpeed = 1.0f;
+    protected float currentGatherSpeed;
+    protected float baseGatherTimer = 1.0f;
+    protected float gatherTimer = 1.0f;
+    protected float baseGatherMultiplier = 1.0f;
+    protected float currentGatherMultiplier;
+    [SerializeField]
     protected float baseMovementSpeed = 1;
     protected float currentMovementSpeed;
     [SerializeField]
@@ -49,6 +57,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     [SerializeField]
     protected float distanceTolerance = 0.5f;
     protected Vector3 targetPosition;
+    protected GameObject dropOffPoint;
     protected IDamageable currentTarget;
     protected IBuildable currentBuild;
 
@@ -57,14 +66,14 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected Queue<Vector3> moveQueue = new Queue<Vector3>();
     protected Queue<IDamageable> attackQueue = new Queue<IDamageable>();
     protected Queue<IBuildable> buildQueue = new Queue<IBuildable>();
+    protected Queue<IGatherable> gatherQueue = new Queue<IGatherable>();
+
     protected NavMeshAgent navAgent;
 
     [SerializeField]
     protected List<ResourceTypes> buildMaterials = new List<ResourceTypes>();
     [SerializeField]
     protected List<int> buildCosts = new List<int>();
-
-
 
     #region Shared Interface Properties
     public bool IsAttackable { get => isAttackable; set => isAttackable = value; }
@@ -101,13 +110,18 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
 
     #region IBuilder Specific Properties
     public float CurrentBuildSpeed { get => currentBuildSpeed; set => currentBuildSpeed = value; }
-
     #endregion
+
+    #region IGatherer Specific Properties
+    public float CurrentGatherSpeed { get => currentGatherSpeed; set => currentGatherSpeed = value; }
+    #endregion
+
     public enum ActionMode
     {
         ACTION,
         ATTACK,
         BUILD,
+        GATHER,
         IDLE,
         MOVE
     }
@@ -119,6 +133,8 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected override void Start()
     {
         base.Start();
+        currentGatherSpeed = baseGatherSpeed;
+        currentGatherMultiplier = baseGatherMultiplier;
         currentBuildSpeed = baseBuildSpeed;
         buildTime = baseBuildTime;
         navAgent = GetComponent<NavMeshAgent>();
@@ -156,6 +172,11 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
         else if (currentActionMode == ActionMode.BUILD)
         {
             BuildBehavior();
+        }
+
+        else if (currentActionMode == ActionMode.GATHER)
+        {
+            GatherBehavior();
         }
 
         else if (currentActionMode == ActionMode.MOVE)
@@ -280,6 +301,11 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
 
     }
 
+    public virtual void GatherTarget(GameObject source, IGatherable target)
+    {
+        Debug.Log("I should be inherited this shouldn't be happening");
+    }
+
     protected virtual void MoveBehavior()
     {
         navAgent.destination = moveQueue.Peek();
@@ -293,7 +319,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
 
     public virtual void AttackBehavior()
     {
-        attackTimer -= Time.deltaTime * baseAttackSpeed;
+        attackTimer -= Time.deltaTime * currentAttackSpeed;
         navAgent.destination = currentTarget.CurrentPosition;
         navAgent.stoppingDistance = meleeRange;
 
@@ -322,13 +348,14 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
 
     public virtual void BuildBehavior()
     {
-        buildTimer -= Time.deltaTime * baseBuildSpeed;
+        
         navAgent.destination = currentBuild.CurrentPosition;
         navAgent.stoppingDistance = meleeRange;
 
 
         if ((transform.position - currentBuild.CurrentPosition).magnitude <= navAgent.stoppingDistance)
         {
+            buildTimer -= Time.deltaTime * currentBuildSpeed;
             if (buildTimer <= 0)
             {
                 Debug.Log(name + " is currently attempting to build: " + currentBuild);
@@ -354,11 +381,18 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
         }
     }
 
+    public virtual void GatherBehavior()
+    {
+
+
+    }
+
     public virtual void ClearAllQueues()
     {
         attackQueue.Clear();
         moveQueue.Clear();
         buildQueue.Clear();
+        gatherQueue.Clear();
         actionQueue.Clear();
 
     }
