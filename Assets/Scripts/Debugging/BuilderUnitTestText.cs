@@ -13,6 +13,8 @@ public class BuilderUnitTestText : MonoBehaviour
     private BaseUnit builderUnit;
     [SerializeField]
     private BaseBuilding building;
+    [SerializeField]
+    private SelectedDictionary selected;
     private void Start()
     {
         builderText = gameObject.GetComponent<TMP_Text>();
@@ -21,18 +23,10 @@ public class BuilderUnitTestText : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (building.buildQueue.Count == 0)
+        builderText.text = "Contains Units: " + selected.ContainsUnits() + "\nContains Nonunits: " + selected.ContainsNonUnits();
+        foreach (GameObject obj in selected.selectedTable.Values)
         {
-            builderText.text = "No buildings in build queue!";
-        }
-
-        else
-        {
-            builderText.text = "Current Time Building: " + building.buildProgress;
-            foreach (GameObject obj in building.buildQueue)
-            {
-                builderText.text += "\n" + obj.name;
-            }
+            builderText.text += "\n" + obj.name;
         }
     }
 }

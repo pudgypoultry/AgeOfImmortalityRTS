@@ -9,6 +9,8 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     protected bool isDead = false;
     protected bool isPlaced = false;
 
+    public int selectionPriority = 100;
+
     [SerializeField]
     protected float baseHP = 10;
     private float currentHP;
@@ -223,7 +225,9 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
             buildProgress += Time.deltaTime;
             if (buildQueue[0].GetComponent<IProject>() != null && buildProgress > buildQueue[0].GetComponent<IProject>().BuildTime)
             {
-                Instantiate(buildQueue[0], summonPosition, Quaternion.identity);
+                GameObject createdGuy = Instantiate(buildQueue[0], summonPosition, Quaternion.identity);
+                createdGuy.GetComponent<IProject>().PlayerID = playerID;
+                createdGuy.GetComponent<Interactable>().AssignPlayer();
                 buildQueue.RemoveAt(0);
                 buildProgress = 0;
             }
@@ -232,19 +236,13 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
 
     public virtual void StartProject(int projectOptionNumber)
     {
-        Debug.Log("poop");
         if (buildOptions[projectOptionNumber].GetComponent<IProject>() != null)
         {
-            Debug.Log("pooooop");
             IProject currentProject = buildOptions[projectOptionNumber].GetComponent<IProject>();
-            Debug.Log("poooooooop");
             if (player.CheckResources(currentProject.BuildMaterials.ToArray(), currentProject.BuildCosts.ToArray()))
             {
-                Debug.Log("pooooooooooop");
                 player.SpendResources(currentProject.BuildMaterials.ToArray(), currentProject.BuildCosts.ToArray());
-                Debug.Log("pooooooooooooop");
                 buildQueue.Add(buildOptions[projectOptionNumber]);
-                Debug.Log("poooooooooooooooop");
             }
         }
 

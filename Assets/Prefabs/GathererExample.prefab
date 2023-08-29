@@ -128,7 +128,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1239494089189483332}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.16, y: 1.22, z: 13.16}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -256,21 +256,21 @@ MonoBehaviour:
   player: {fileID: 0}
   canAttack: 0
   canBuild: 0
-  canGather: 0
-  selectorCircle: {fileID: 0}
-  baseBuildTime: 1
+  canGather: 1
+  selectorCircle: {fileID: 1239494089017324394}
+  buildTime: 3
   baseHP: 10
   baseDefense: 1
   baseAttack: 1
   baseAttackSpeed: 1
   baseBuildSpeed: 1
   baseGatherSpeed: 1
-  baseMovementSpeed: 1
-  meleeRange: 1
+  baseMovementSpeed: 10
+  meleeRange: 3
   projectileRange: 10
   distanceTolerance: 0.5
-  buildMaterials: 
-  buildCosts: 
+  buildMaterials: 04000000
+  buildCosts: c8000000
   currentActionMode: 4
 --- !u!1 &4759361465508134274
 GameObject:

@@ -6,7 +6,7 @@ public class BaseDropOff : BaseBuilding, IDropOff
 {
 
     protected Dictionary<ResourceTypes, bool> resourceDropOff = new Dictionary<ResourceTypes, bool>();
-
+    public List<ResourceTypes> validDropOffs = new List<ResourceTypes>();
     public Dictionary<ResourceTypes, bool> ResourceDropoff { get => resourceDropOff; set => resourceDropOff = value; }
 
     // Start is called before the first frame update
@@ -16,11 +16,20 @@ public class BaseDropOff : BaseBuilding, IDropOff
         player.dropOffPoints.Add(this);
         resourceDropOff.Add(ResourceTypes.BLOOD, false);
         resourceDropOff.Add(ResourceTypes.FAITH, false);
-        resourceDropOff.Add(ResourceTypes.FOOD, true);
-        resourceDropOff.Add(ResourceTypes.GOLD, true);
+        resourceDropOff.Add(ResourceTypes.FOOD, false);
+        resourceDropOff.Add(ResourceTypes.WOOD, false);
+        resourceDropOff.Add(ResourceTypes.GOLD, false);
         resourceDropOff.Add(ResourceTypes.MADNESS, false);
         resourceDropOff.Add(ResourceTypes.RAGE, false);
         resourceDropOff.Add(ResourceTypes.STONE, false);
+
+        foreach (ResourceTypes key in resourceDropOff.Keys)
+        {
+            if (validDropOffs.Contains(key))
+            { 
+                resourceDropOff[key] = true;
+            }
+        }
     }
 
     protected override void Update()

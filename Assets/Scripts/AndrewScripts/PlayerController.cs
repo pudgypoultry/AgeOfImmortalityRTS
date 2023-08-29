@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public int playerID = 0;
     protected RaycastHit hit;
+    public SelectedDictionary selectedDictionary;
     public List<Interactable> selectedUnits = new List<Interactable>();
     public List<IDropOff> dropOffPoints = new List<IDropOff>();
 
@@ -17,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public bool isDragging = false;
     public Vector3 originalMousePosition;
 
+    public UIButtonControl buttonController;
 
     private void OnGUI()
     {
@@ -34,6 +36,10 @@ public class PlayerController : MonoBehaviour
     {
         MouseControl();
 
+        if (selectedUnits.Count != 0 && selectedUnits[0].GetComponent<BaseBuilding>() != null)
+        {
+            RestructureButtons(selectedUnits[0].gameObject);
+        }
     }
 
     private void MouseControl()
@@ -234,6 +240,11 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void RestructureButtons(GameObject source)
+    { 
+        buttonController.RestructureButtons(source);
     }
 
 }

@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5998574009629546901}
   - component: {fileID: 5998574009629546906}
   m_Layer: 0
-  m_Name: ExampleUnit
+  m_Name: ExampleEnemy
   m_TagString: PlayerUnit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -154,13 +154,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e44e11f17568674297a8defdd6ecf80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerID: 0
+  playerID: 1
   player: {fileID: 0}
   canAttack: 1
   canBuild: 1
   canGather: 0
   selectorCircle: {fileID: 5998574009725946242}
-  buildTime: 3
+  baseBuildTime: 3
   baseHP: 10
   baseDefense: 1
   baseAttack: 1
@@ -168,9 +168,9 @@ MonoBehaviour:
   baseBuildSpeed: 1
   baseGatherSpeed: 1
   baseMovementSpeed: 10
-  meleeRange: 3
+  meleeRange: 1
   projectileRange: 10
-  distanceTolerance: 0.5
+  distanceTolerance: 10
   buildMaterials: 0700000003000000
   buildCosts: 1e00000019000000
   currentActionMode: 3
@@ -334,7 +334,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 76db7283b80046646b90565203e9e305, type: 2}
+  - {fileID: 2100000, guid: 576d2702a84a4b64fb1a8df127f25dcb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

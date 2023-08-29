@@ -33,12 +33,23 @@ public class Interactable : MonoBehaviour, ISelectable
     public bool CanAttack { get => canAttack; set => canAttack = value; }
     public bool CanBuild { get => canBuild; set => canBuild = value; }
     public bool CanGather { get => canGather; set => canGather = value; }
+    public int PlayerID { get => playerID; set => playerID = value; }
     public Vector3 CurrentPosition { get => currentPosition; set => currentPosition = value; }
     #endregion
 
     protected virtual void Start()
     {
         selectorCircle.SetActive(false);
+        if (player == null)
+        {
+            foreach (PlayerController controller in FindObjectsOfType<PlayerController>())
+            {
+                if (controller.playerID == playerID)
+                {
+                    player = controller;
+                }
+            }
+        }
     }
 
     // Update is called once per frame
@@ -46,6 +57,18 @@ public class Interactable : MonoBehaviour, ISelectable
     {
         currentPosition = transform.position;
     }
+
+    public virtual void AssignPlayer()
+    {
+        foreach (PlayerController controller in FindObjectsOfType<PlayerController>())
+        {
+            if (controller.playerID == playerID)
+            {
+                player = controller;
+            }
+        }
+    }
+
 
     public virtual void InteractWith(GameObject source)
     {

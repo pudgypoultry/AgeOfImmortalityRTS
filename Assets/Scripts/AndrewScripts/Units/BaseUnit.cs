@@ -17,8 +17,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected bool attackCommandIssued;
     protected bool isDead;
     [SerializeField]
-    protected float baseBuildTime = 1.0f;
-    protected float buildTime;
+    protected float buildTime = 1.0f;
 
     [SerializeField]
     protected float baseHP = 10;
@@ -133,10 +132,6 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     protected override void Start()
     {
         base.Start();
-        currentGatherSpeed = baseGatherSpeed;
-        currentGatherMultiplier = baseGatherMultiplier;
-        currentBuildSpeed = baseBuildSpeed;
-        buildTime = baseBuildTime;
         navAgent = GetComponent<NavMeshAgent>();
         navAgent.speed = baseMovementSpeed;
         navAgent.stoppingDistance = meleeRange;
@@ -199,6 +194,9 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
         currentHP = baseHP;
         currentMovementSpeed = baseMovementSpeed;
         currentAttackSpeed = baseAttackSpeed;
+        currentGatherSpeed = baseGatherSpeed;
+        currentGatherMultiplier = baseGatherMultiplier;
+        currentBuildSpeed = baseBuildSpeed;
     }
 
     // Public function that allows other units to attack this
@@ -244,7 +242,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
         {
             ClearAllQueues();
         }
-        moveQueue.Enqueue(target);
+        moveQueue.Enqueue(new Vector3(target.x, transform.position.y, target.z));
         actionQueue.Enqueue(ActionMode.MOVE);
 
     }

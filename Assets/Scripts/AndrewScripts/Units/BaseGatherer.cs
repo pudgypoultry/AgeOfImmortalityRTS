@@ -18,6 +18,7 @@ public class BaseGatherer : BaseUnit, IGatherer
         gatherBag.Add(ResourceTypes.FAITH, 0);
         gatherBag.Add(ResourceTypes.FOOD, 0);
         gatherBag.Add(ResourceTypes.GOLD, 0);
+        gatherBag.Add(ResourceTypes.WOOD, 0);
         gatherBag.Add(ResourceTypes.MADNESS, 0);
         gatherBag.Add(ResourceTypes.RAGE, 0);
         gatherBag.Add(ResourceTypes.STONE, 0);
@@ -26,9 +27,11 @@ public class BaseGatherer : BaseUnit, IGatherer
         gatherMaximums.Add(ResourceTypes.FAITH, 50);
         gatherMaximums.Add(ResourceTypes.FOOD, 50);
         gatherMaximums.Add(ResourceTypes.GOLD, 50);
+        gatherMaximums.Add(ResourceTypes.WOOD, 50);
         gatherMaximums.Add(ResourceTypes.MADNESS, 50);
         gatherMaximums.Add(ResourceTypes.RAGE, 50);
         gatherMaximums.Add(ResourceTypes.STONE, 50);
+
     }
 
     // Update is called once per frame
