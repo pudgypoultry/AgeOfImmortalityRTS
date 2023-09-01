@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2161.2266, g: 2267.9453, b: 3299.5195, a: 1}
+  m_IndirectSpecularColor: {r: 2159.876, g: 2264.252, b: 3287.582, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -500,6 +500,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GoldDropOffExample
+      objectReference: {fileID: 0}
+    - target: {fileID: 96272515095162149, guid: fbdc0587d8b869947abed974392a5ceb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 96272515095162152, guid: fbdc0587d8b869947abed974392a5ceb,
         type: 3}
@@ -1418,6 +1423,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WoodDropOffExample
+      objectReference: {fileID: 0}
+    - target: {fileID: 96272515095162149, guid: 8a46ac998d8d3734dbd147a7f5da9930,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 96272515095162152, guid: 8a46ac998d8d3734dbd147a7f5da9930,
         type: 3}
@@ -3186,6 +3196,7 @@ MonoBehaviour:
   isDragging: 0
   originalMousePosition: {x: 0, y: 0, z: 0}
   buttonController: {fileID: 8745039788760628768}
+  buttonsShouldChange: 0
 --- !u!1 &1720209366
 GameObject:
   m_ObjectHideFlags: 0
@@ -3700,6 +3711,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: StoneDropOffExample
+      objectReference: {fileID: 0}
+    - target: {fileID: 96272515095162149, guid: 6b6b22a7f4c806a4f9a270cec00a44bf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 96272515095162152, guid: 6b6b22a7f4c806a4f9a270cec00a44bf,
         type: 3}
@@ -4545,6 +4561,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2338122852369865643, guid: 68941044e277ae142bb7dfdfacbf1c7b,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 2.265
+      objectReference: {fileID: 0}
     - target: {fileID: 7789562373979473670, guid: 68941044e277ae142bb7dfdfacbf1c7b,
         type: 3}
       propertyPath: m_RootOrder

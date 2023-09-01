@@ -7,6 +7,7 @@ public interface IBuildable
 {
     bool IsPlaced { get; set; }
     float BuildTime { get; set; }
+    float BaseBuildTime { get; set; }
     Vector3 CurrentPosition { get; set; }
     List<int> BuildCosts { get; }
     List<ResourceTypes> BuildMaterials { get; }

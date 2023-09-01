@@ -41,9 +41,11 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     [SerializeField]
     protected GameObject summonPositionObject;
     public Vector3 summonPosition;
-
+    public ProjectBarManager progressBar;
+    public BuildBarManager buildBar;
 
     #region IDamageable Specific Properties
+    public float BaseHP { get => baseHP; set => baseHP = value; }
     public float CurrentHP { get => currentHP; set => currentHP = value; }
     public float CurrentDefense { get => currentDefense; set => currentDefense = value; }
     #endregion
@@ -51,6 +53,7 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
     #region IBuildable Specific Properties
     public bool IsPlaced { get => isPlaced; set => isPlaced = value; }
     public float BuildTime { get => buildTime; set => buildTime = value; }
+    public float BaseBuildTime { get => baseBuildTime; set => baseBuildTime = value; }
     public List<int> BuildCosts { get => buildCosts; }
     public List<ResourceTypes> BuildMaterials { get => buildMaterials; }
     #endregion
@@ -68,8 +71,7 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
         base.Start();
         ChangeState();
         summonPosition = summonPositionObject.transform.position;
-
-
+        currentHP = baseHP;
 
     }
 
@@ -169,14 +171,20 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
 
     protected virtual void ChangeState()
     {
-        Debug.Log("DOIN IT: " + currentState);
+        // Debug.Log("DOIN IT: " + currentState);
         
         if (currentState == BuildState.CONSTRUCTING)
         {
-            Debug.Log("Poooooop");
+            // Debug.Log("Poooooop");
             constructingPrefab.SetActive(true);
             builtPrefab.SetActive(false);
             destroyedPrefab.SetActive(false);
+            if (progressBar != null)
+            {
+                buildBar.buildBar.gameObject.SetActive(true);
+                progressBar.progressBar.gameObject.SetActive(false);
+            }
+
         }
 
         if (currentState == BuildState.BUILT)
@@ -184,6 +192,11 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
             constructingPrefab.SetActive(false);
             builtPrefab.SetActive(true);
             destroyedPrefab.SetActive(false);
+            if (progressBar != null)
+            {
+                buildBar.buildBar.gameObject.SetActive(false);
+                progressBar.progressBar.gameObject.SetActive(true);
+            }
         }
 
         if (currentState == BuildState.DESTROYED)
@@ -191,6 +204,11 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
             constructingPrefab.SetActive(false);
             builtPrefab.SetActive(false);
             destroyedPrefab.SetActive(true);
+            if (progressBar != null)
+            {
+                buildBar.buildBar.gameObject.SetActive(true);
+                progressBar.progressBar.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -222,6 +240,7 @@ public class BaseBuilding : Interactable, IBuildable, IDamageable
 
         if (buildQueue.Count > 0 && currentState == BuildState.BUILT)
         {
+            progressBar.projectTarget = buildQueue[0].GetComponent<IProject>();
             buildProgress += Time.deltaTime;
             if (buildQueue[0].GetComponent<IProject>() != null && buildProgress > buildQueue[0].GetComponent<IProject>().BuildTime)
             {

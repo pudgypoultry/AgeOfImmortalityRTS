@@ -4,6 +4,7 @@ using UnityEngine;
 
 public interface IDamageable
 {
+    float BaseHP { get; set; }
     float CurrentHP { get; set; }
     float CurrentDefense { get; set; }
     Vector3 CurrentPosition { get; set; }

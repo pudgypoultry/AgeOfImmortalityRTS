@@ -13,6 +13,7 @@ public class BaseDropOff : BaseBuilding, IDropOff
     protected override void Start()
     {
         base.Start();
+        
         player.dropOffPoints.Add(this);
         resourceDropOff.Add(ResourceTypes.BLOOD, false);
         resourceDropOff.Add(ResourceTypes.FAITH, false);
@@ -23,13 +24,11 @@ public class BaseDropOff : BaseBuilding, IDropOff
         resourceDropOff.Add(ResourceTypes.RAGE, false);
         resourceDropOff.Add(ResourceTypes.STONE, false);
 
-        foreach (ResourceTypes key in resourceDropOff.Keys)
+        foreach (ResourceTypes validType in validDropOffs)
         {
-            if (validDropOffs.Contains(key))
-            { 
-                resourceDropOff[key] = true;
-            }
+            resourceDropOff[validType] = true;
         }
+        // Debug.Log("Them apples");
     }
 
     protected override void Update()

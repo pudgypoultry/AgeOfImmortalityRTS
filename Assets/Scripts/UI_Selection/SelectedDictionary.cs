@@ -13,7 +13,7 @@ public class SelectedDictionary : MonoBehaviour
     {
         int id = obj.GetInstanceID();
 
-        if (!selectedTable.ContainsKey(id) && !obj.CompareTag("Ground"))
+        if (!selectedTable.ContainsKey(id) && obj.GetComponent<Interactable>() != null)
         {
             selectedTable.Add(id, obj);
             // obj.AddComponent<SelectionComponent>();
@@ -30,10 +30,21 @@ public class SelectedDictionary : MonoBehaviour
         {
             RemoveEnemies();
         }
+
+        List<Interactable> updatedSelection = new List<Interactable>();
+        foreach (KeyValuePair<int, GameObject> kvp in selectedTable)
+        {
+            if (kvp.Value.GetComponent<Interactable>() != null)
+            {
+                updatedSelection.Add(kvp.Value.GetComponent<Interactable>());
+            }
+        }
+        player.UpdateSelectedList(updatedSelection);
     }
 
     public void Deselect(int id)
-    { 
+    {
+        selectedTable[id].GetComponent<Interactable>().Deselect();
         // Destroy(selectedTable[id].GetComponent<SelectionComponent>());
         selectedTable.Remove(id);
     }
@@ -42,9 +53,9 @@ public class SelectedDictionary : MonoBehaviour
     {
         foreach (KeyValuePair<int, GameObject> kvp in selectedTable)
         {
-            if (kvp.Value != null)
-            { 
-                // Destroy(selectedTable[kvp.Key].GetComponent<SelectionComponent>());
+            if (kvp.Value != null && selectedTable[kvp.Key].GetComponent<Interactable>() != null)
+            {
+                selectedTable[kvp.Key].GetComponent<Interactable>().Deselect();
             }
         }
         selectedTable.Clear();
@@ -107,30 +118,6 @@ public class SelectedDictionary : MonoBehaviour
         return false;
     }
 
-    public void RemoveNonUnits()
-    {
-        List<int> keysToRemove = new List<int>();
-
-        foreach (KeyValuePair<int, GameObject> kvp in selectedTable)
-        {
-            if (selectedTable[kvp.Key].GetComponent<BaseUnit>() == null)
-            {
-                // Debug.Log("Removing: " + kvp.Value);
-                keysToRemove.Add(kvp.Key);
-            }
-        }
-
-        foreach (int i in keysToRemove)
-        {
-            if (selectedTable[i].GetComponent<Interactable>() != null)
-            {
-                Debug.Log("REMOVING FROM SELECTION DICTIONARY: " + selectedTable[i]);
-            }
-
-            selectedTable.Remove(i);
-        }
-    }
-
     public bool ContainsEnemies()
     {
         foreach (GameObject obj in selectedTable.Values)
@@ -157,6 +144,30 @@ public class SelectedDictionary : MonoBehaviour
         return false;
     }
 
+    public void RemoveNonUnits()
+    {
+        List<int> keysToRemove = new List<int>();
+
+        foreach (KeyValuePair<int, GameObject> kvp in selectedTable)
+        {
+            if (selectedTable[kvp.Key].GetComponent<BaseUnit>() == null)
+            {
+                // Debug.Log("Removing: " + kvp.Value);
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+
+        foreach (int i in keysToRemove)
+        {
+            if (selectedTable[i].GetComponent<Interactable>() != null)
+            {
+                Debug.Log("REMOVING FROM SELECTION DICTIONARY: " + selectedTable[i]);
+            }
+            selectedTable[i].GetComponent<Interactable>().Deselect();
+            selectedTable.Remove(i);
+        }
+    }
+
     public void RemoveEnemies()
     {
         List<int> keysToRemove = new List<int>();
@@ -173,6 +184,7 @@ public class SelectedDictionary : MonoBehaviour
         {
             Debug.Log("REMOVING FROM SELECTION DICTIONARY: " + selectedTable[i]);
             // selectedTable[i].GetComponent<Interactable>().Deselect();
+            selectedTable[i].GetComponent<Interactable>().Deselect();
             selectedTable.Remove(i);
         }
     }

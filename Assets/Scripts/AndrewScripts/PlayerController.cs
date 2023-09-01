@@ -7,7 +7,6 @@ public class PlayerController : MonoBehaviour
 {
     public int playerID = 0;
     protected RaycastHit hit;
-    public SelectedDictionary selectedDictionary;
     public List<Interactable> selectedUnits = new List<Interactable>();
     public List<IDropOff> dropOffPoints = new List<IDropOff>();
 
@@ -19,6 +18,8 @@ public class PlayerController : MonoBehaviour
     public Vector3 originalMousePosition;
 
     public UIButtonControl buttonController;
+
+    public bool buttonsShouldChange = false;
 
     private void OnGUI()
     {
@@ -36,9 +37,16 @@ public class PlayerController : MonoBehaviour
     {
         MouseControl();
 
-        if (selectedUnits.Count != 0 && selectedUnits[0].GetComponent<BaseBuilding>() != null)
+        if (buttonsShouldChange && selectedUnits.Count != 0 && selectedUnits[0].GetComponent<BaseBuilding>() != null)
         {
             RestructureButtons(selectedUnits[0].gameObject);
+            buttonsShouldChange = false;
+        }
+
+        if (buttonsShouldChange && selectedUnits.Count == 0)
+        {
+            RestructureButtons(this.gameObject);
+            buttonsShouldChange = false;
         }
     }
 
@@ -58,7 +66,7 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("What you clicked: "+hit.transform.tag);
                 if (hit.transform.GetComponent<Interactable>() != null && hit.transform.GetComponent<Interactable>().playerID == playerID)
                 {
-                    SelectUnit(hit.transform.GetComponent<Interactable>(), Input.GetKey(KeyCode.LeftShift));
+                    // SelectUnit(hit.transform.GetComponent<Interactable>(), Input.GetKey(KeyCode.LeftShift));
                 }
                 else
                 {
@@ -80,7 +88,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (IsWithinSelectionBounds(selectableObject.transform) && selectableObject.playerID == playerID)
                 {
-                    SelectUnit(selectableObject.gameObject.GetComponent<Interactable>(), true);
+                    // SelectUnit(selectableObject.gameObject.GetComponent<Interactable>(), true);
                 }
             }
 
@@ -231,10 +239,10 @@ public class PlayerController : MonoBehaviour
         {
             foreach (ResourceTypes type in resourceList)
             {
-                Debug.Log("Currently trying to spend " + amounts[i] + " of " + types[i]);
+                
                 if (type == types[i])
                 {
-                    
+                    // Debug.Log("Currently trying to spend " + amounts[i] + " of " + types[i]);
                     resourceAmounts[System.Array.IndexOf(resourceList, type)] -= amounts[i];
                     break;
                 }
@@ -245,6 +253,18 @@ public class PlayerController : MonoBehaviour
     public void RestructureButtons(GameObject source)
     { 
         buttonController.RestructureButtons(source);
+    }
+
+    public void UpdateSelectedList(List<Interactable> interactablesToSelect)
+    { 
+        selectedUnits = interactablesToSelect;
+
+        foreach (Interactable unit in selectedUnits)
+        {
+            unit.Select();
+        }
+
+        buttonsShouldChange = true;
     }
 
 }

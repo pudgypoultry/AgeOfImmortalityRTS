@@ -20,6 +20,7 @@ public class UIButtonControl : MonoBehaviour
 
             for (i = 0; i < potentialProjects.Count; i++)
             {
+                // Debug.Log("CHECKING FOR I: " + i);
                 buttons[i].gameObject.SetActive(true);
                 buttons[i].transform.GetChild(0).GetComponent<TMP_Text>().text = potentialProjects[i].name;
                 buttons[i].onClick.RemoveAllListeners();
@@ -30,6 +31,14 @@ public class UIButtonControl : MonoBehaviour
             {
                 buttons[j].onClick.RemoveAllListeners();
                 buttons[j].gameObject.SetActive(false);
+            }
+        }
+
+        else 
+        {
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                buttons[i].gameObject.SetActive(false);
             }
         }
 

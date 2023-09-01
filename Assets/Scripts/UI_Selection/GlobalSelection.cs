@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class GlobalSelection : MonoBehaviour
 {
@@ -61,7 +62,7 @@ public class GlobalSelection : MonoBehaviour
                     {
                         selectedTable.AddSelected(hit.transform.gameObject);
                     }
-                    else
+                    else if (!EventSystem.current.IsPointerOverGameObject())
                     {
                         selectedTable.DeselectAll();
                         selectedTable.AddSelected(hit.transform.gameObject);
@@ -69,7 +70,7 @@ public class GlobalSelection : MonoBehaviour
                 }
                 else
                 {
-                    if (!Input.GetKey(KeyCode.LeftShift))
+                    if (!Input.GetKey(KeyCode.LeftShift) && !EventSystem.current.IsPointerOverGameObject())
                     {
                         selectedTable.DeselectAll();
                     }

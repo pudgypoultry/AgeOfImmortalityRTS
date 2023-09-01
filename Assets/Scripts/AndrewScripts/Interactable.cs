@@ -9,6 +9,7 @@ public class Interactable : MonoBehaviour, ISelectable
     [SerializeField]
     public PlayerController player;
     protected bool isSelectable;
+    [SerializeField]
     protected bool isSelected;
     protected bool isGroupable;
     protected bool isGrouped;

@@ -83,6 +83,7 @@ public class BaseUnit : Interactable, IDamageable, IMoveable, IProject, IAttacke
     #endregion
 
     #region IDamageable Specific Properties
+    public float BaseHP { get => baseHP; set => baseHP = value; }
     public float CurrentHP { get => currentHP; set => currentHP = value; }
     public float CurrentDefense { get => currentDefense; set => currentDefense = value; }
     public IDamageable CurrentTarget { get => currentTarget; set => currentTarget = value; }
